@@ -1,9 +1,35 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import io from "socket.io-client";
+import { ReactSketchCanvas } from "react-sketch-canvas";
+import SVGO from "https://unpkg.com/svgo@2.8.0/dist/svgo.browser.js";
+
 import "./App.css";
 
 function App() {
   const [socket, setSocket] = useState(null);
+  const [eingabe, setEingabe] = useState("");
+  const [message, setMessage] = useState();
+
+  const canvas = useRef();
+
+  function getImage() {
+    canvas.current
+      .exportSvg()
+      .then((data) => {
+        let result = SVGO.optimize(data, {
+          plugins: [
+            { name: "preset-default" }, // enable default preset
+          ],
+        });
+        socket.emit("chat message", result.data);
+        setDrawing(result.data);
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  }
+  const [strokewidth, setStrokewidth] = useState(10);
+  const [drawing, setDrawing] = useState();
 
   useEffect(() => {
     const newSocket = io(
@@ -20,26 +46,31 @@ function App() {
   }, [setSocket]);
 
   useEffect(() => {
-    if(socket){
+    if (socket) {
       socket.on("chat message", function (msg) {
-        console.log(msg);
+        setMessage(msg);
       });
     }
   }, [socket]);
 
-  const [eingabe, setEingabe] = useState("");
-
   return (
     <div className="App">
-      <ul id="messages"></ul>
-      <input value={eingabe} onChange={(e) => setEingabe(e.target.value)} />
-      <button
-        onClick={() => {
-          socket.emit("chat message", eingabe);
+      <ReactSketchCanvas
+        ref={canvas}
+        width="400px"
+        height="400px"
+        strokeWidth={strokewidth}
+        strokeColor="red"
+        onChange={() => getImage()}
+      />
+
+      <button onClick={() => setStrokewidth(1)}>Stroke</button>
+
+      <div
+        dangerouslySetInnerHTML={{
+          __html: message,
         }}
-      >
-        Send
-      </button>
+      />
     </div>
   );
 }
