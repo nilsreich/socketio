@@ -33,7 +33,7 @@ function App() {
 
   useEffect(() => {
     const newSocket = io(
-      "https://nilsreich-socketio-x5qjg5g36wgv-5000.githubpreview.dev",
+      "https://nilsreich-socketio-x5qjg5g36wgv-5001.githubpreview.dev",
       {
         withCredentials: true,
         extraHeaders: {
@@ -44,6 +44,8 @@ function App() {
     setSocket(newSocket);
     return () => newSocket.close();
   }, [setSocket]);
+
+
 
   useEffect(() => {
     if (socket) {

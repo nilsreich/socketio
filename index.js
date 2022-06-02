@@ -11,15 +11,19 @@ const io = new Server(server, {
     credentials: true,
   },
 });
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/index.html");
 });
 
 io.on("connection", (socket) => {
-  socket.on("join", (room) => {
-    socket.join(room);
+  socket.on("join", (room2) => {
+    const lastValue = [...socket.rooms].pop();
+    socket.leave(lastValue);
+    socket.join(room2);
+
+    console.log(socket.rooms);
   });
   socket.on("chat message", (msg, room) => {
     io.to(room).emit("chat message", msg);
