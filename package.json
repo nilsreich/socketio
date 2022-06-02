@@ -20,6 +20,7 @@
   "scripts": {
     "start": "node index.js",
     "dev": "react-scripts start",
+    "double": "npm run start & npm run dev",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

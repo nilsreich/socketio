@@ -7,8 +7,8 @@ import "./App.css";
 
 function App() {
   const [socket, setSocket] = useState(null);
-  const [eingabe, setEingabe] = useState("");
   const [message, setMessage] = useState();
+  const [room, setRoom] = useState("");
 
   const canvas = useRef();
 
@@ -21,7 +21,7 @@ function App() {
             { name: "preset-default" }, // enable default preset
           ],
         });
-        socket.emit("chat message", result.data);
+        socket.emit("chat message", result.data, room);
         setDrawing(result.data);
       })
       .catch((e) => {
@@ -51,17 +51,26 @@ function App() {
         setMessage(msg);
       });
     }
+    console.log(socket);
   }, [socket]);
+
+  function joinRoom() {
+    if (socket) {
+      socket.emit("join", room);
+    }
+  }
 
   return (
     <div className="App">
+      <input value={room} onChange={(e) => setRoom(e.target.value)} />
+      <button onClick={() => joinRoom()}>Join</button>
       <ReactSketchCanvas
         ref={canvas}
         width="400px"
         height="400px"
         strokeWidth={strokewidth}
         strokeColor="red"
-        onChange={() => getImage()}
+        onStroke={() => getImage()}
       />
 
       <button onClick={() => setStrokewidth(1)}>Stroke</button>
