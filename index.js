@@ -13,10 +13,6 @@ const io = new Server(server, {
 });
 const PORT = process.env.PORT || 5001;
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/index.html");
-});
-
 io.on("connection", (socket) => {
   socket.on("join", (room2) => {
     const lastValue = [...socket.rooms].pop();
@@ -27,6 +23,10 @@ io.on("connection", (socket) => {
   });
   socket.on("chat message", (msg, room) => {
     io.to(room).emit("chat message", msg);
+  });
+
+  socket.on("point update", (index, name, room) => {
+    io.to(room).emit("point update", index, name);
   });
 });
 
